@@ -31,7 +31,7 @@ def verify(path, data):
         raise SystemExit(f"entry sha256 {digest}, expected {EXPECTED_SHA256}")
     if on_disk != data:
         raise SystemExit("entry bytes differ from the line")
-    return on_disk
+    return True
 
 
 def main():
@@ -43,7 +43,9 @@ def main():
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     with open(OUTPUT_PATH, "wb") as handle:
         handle.write(data)
-    verify(OUTPUT_PATH, data)
+    verified = verify(OUTPUT_PATH, data)
+    if not verified:
+        raise SystemExit("read-back verification failed for entry.txt")
     sys.stdout.write(
         f"wrote {OUTPUT_PATH} "
         f"({len(data)} bytes, sha256 {EXPECTED_SHA256})\n"
